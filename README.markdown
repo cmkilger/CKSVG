@@ -1,6 +1,6 @@
 #CKSVG
 
-CKSVG is the beginnings of a Cocoa SVG parser and drawer (using Core Graphics) that I started a long time ago.  So far it does a decent job doing a path (except for ellipses).
+CKSVG is the beginnings of a Cocoa SVG parser and drawer (using Core Graphics) that I started a long time ago.  So far it does a decent job doing a path (except for ellipses).  Attempts to follow the [SVG 1.1 specification](http://www.w3.org/TR/SVG/).
 
 ##Usage
 
