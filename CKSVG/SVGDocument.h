@@ -30,8 +30,6 @@
 #import "SVGContainer.h"
 #import "SVGElement.h"
 
-@interface SVGDocument : SVGElement <SVGContainer> {
-	NSMutableArray *elements;
-}
+@interface SVGDocument : SVGElement <SVGContainer>
 
 @end

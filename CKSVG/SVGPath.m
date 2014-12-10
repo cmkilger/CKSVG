@@ -29,66 +29,66 @@
 
 #import "SVGPath.h"
 #import "SVG.h"
+#import "SVGElementInternal.h"
+
+@interface SVGPath ()
+
+@property (strong) __attribute__((NSObject)) CGMutablePathRef path;
+
+@end
 
 @implementation SVGPath
 
-- (id)initWithAttributes:(NSDictionary *)attributeDict {
-	if (![super init])
-		return nil;
-	
-	path = SVGPathForPathData([attributeDict objectForKey:@"d"]);
-	
-	// Use specified fill or inherit
-	NSString *fillStr = [attributeDict objectForKey:@"fill"];
-	if (fillStr && ![fillStr isEqualToString:@"inherit"])
-		fill = SVGColorWithPaint(fillStr);
-	else
-		fill = self.parentContainer.fill;
-	CGColorRetain(fill);
-	
-	// Use specified stroke or inherit
-	NSString *strokeStr = [attributeDict objectForKey:@"stroke"];
-	if (strokeStr && ![strokeStr isEqualToString:@"inherit"])
-		stroke = SVGColorWithPaint(strokeStr);
-	else
-		stroke = self.parentContainer.stroke;
-	CGColorRetain(stroke);
-	
-	// Use specified stroke-width or inherit
-	NSString *strokeWidthStr = [attributeDict objectForKey:@"stroke-width"];
-	if (strokeWidthStr && ![strokeWidthStr isEqualToString:@"inherit"])
-		strokeWidth = SVGFloatWithLength(strokeWidthStr);
-	else
-		strokeWidth = self.parentContainer.strokeWidth;
-	
-	// Use specified stroke-linejoin or inherit
-	NSString *strokeLineJoinStr = [attributeDict objectForKey:@"stroke-linejoin"];
-	if (strokeLineJoinStr && ![strokeLineJoinStr isEqualToString:@"inherit"])
-		strokeLineJoin = SVGLineJoinWithLineJoin(strokeLineJoinStr);
-	else
-		strokeLineJoin = self.parentContainer.strokeLineJoin;
-	
-	return self;
+- (instancetype)initWithAttributes:(NSDictionary *)attributeDict {
+    self = [super init];
+    if (self) {
+        CGMutablePathRef path = SVGPathForPathData(attributeDict[@"d"]);
+        self.path = path;
+        CGPathRelease(path);
+        
+        // Use specified fill or inherit
+        NSString *fillStr = attributeDict[@"fill"];
+        if (fillStr && ![fillStr isEqualToString:@"inherit"])
+            self.fill = SVGColorWithPaint(fillStr);
+        else
+            self.fill = self.parentContainer.fill;
+        
+        // Use specified stroke or inherit
+        NSString *strokeStr = attributeDict[@"stroke"];
+        if (strokeStr && ![strokeStr isEqualToString:@"inherit"])
+            self.stroke = SVGColorWithPaint(strokeStr);
+        else
+            self.stroke = self.parentContainer.stroke;
+        
+        // Use specified stroke-width or inherit
+        NSString *strokeWidthStr = attributeDict[@"stroke-width"];
+        if (strokeWidthStr && ![strokeWidthStr isEqualToString:@"inherit"])
+            self.strokeWidth = SVGFloatWithLength(strokeWidthStr);
+        else
+            self.strokeWidth = self.parentContainer.strokeWidth;
+        
+        // Use specified stroke-linejoin or inherit
+        NSString *strokeLineJoinStr = attributeDict[@"stroke-linejoin"];
+        if (strokeLineJoinStr && ![strokeLineJoinStr isEqualToString:@"inherit"])
+            self.strokeLineJoin = SVGLineJoinWithLineJoin(strokeLineJoinStr);
+        else
+            self.strokeLineJoin = self.parentContainer.strokeLineJoin;
+    }
+    return self;
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
 //	NSLog(@"Draw path");
+    CGPathRef path = self.path;
 	CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
-	CGContextSetLineWidth(context, strokeWidth);
-	CGContextSetLineJoin(context, strokeLineJoin);
-	CGContextSetStrokeColorWithColor(context, stroke);
-	CGContextSetFillColorWithColor(context, fill);
+	CGContextSetLineWidth(context, self.strokeWidth);
+	CGContextSetLineJoin(context, self.strokeLineJoin);
+	CGContextSetStrokeColorWithColor(context, self.stroke);
+	CGContextSetFillColorWithColor(context, self.fill);
 	CGContextAddPath(context, path);
 	CGContextFillPath(context);
 	CGContextAddPath(context, path);
 	CGContextStrokePath(context);
-}
-
-- (void)dealloc {
-	CGPathRelease(path);
-	CGColorRelease(fill);
-	CGColorRelease(stroke);
-	[super dealloc];
 }
 
 @end

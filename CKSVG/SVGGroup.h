@@ -31,8 +31,8 @@
 #import "SVGContainer.h"
 
 
-@interface SVGGroup : SVGElement <SVGContainer> {
-	NSMutableArray *elements;
-}
+@interface SVGGroup : SVGElement <SVGContainer>
+
+- (instancetype)initWithAttributes:(NSDictionary *)attributeDict NS_DESIGNATED_INITIALIZER;
 
 @end

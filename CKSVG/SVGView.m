@@ -29,63 +29,63 @@
 
 #import "SVG.h"
 
+@interface SVGView ()
+
+@property (strong) NSMutableArray *elements;
+@property (strong) NSMutableArray *containerStack;
+@property (assign) CGRect normalFrame;
+
+@end
 
 @implementation SVGView
 
-@synthesize elements;
-@synthesize scale;
-
-- (id)initWithData:(NSData *)data {
-	if (![self init])
-		return nil;
-	
-	scale = 1.0;
-	
-	elements = [[NSMutableArray alloc] init];
-	
-	NSXMLParser *xml = [[NSXMLParser alloc] initWithData:data];
-	[xml setDelegate:self];
-	[xml parse];
-	[xml release];
-	
-	return self;
+- (instancetype)initWithData:(NSData *)data {
+    self = [self init];
+    if (self) {
+        self.scale = 1.0;
+        
+        self.elements = [[NSMutableArray alloc] init];
+        
+        NSXMLParser *xml = [[NSXMLParser alloc] initWithData:data];
+        [xml setDelegate:self];
+        [xml parse];
+    }
+    return self;
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
 //	NSLog(@"Draw view");
+    CGFloat scale = self.scale;
 	CGContextRef context = [[NSGraphicsContext currentContext] graphicsPort];
 	CGContextSetFillColorWithColor(context, CGColorGetConstantColor(kCGColorWhite));
 	CGContextFillRect(context, dirtyRect);
 	CGContextScaleCTM(context, 1.0, -1.0);
 	CGContextTranslateCTM(context, 0.0, -[self frame].size.height);
 	CGContextScaleCTM(context, scale, scale);
-	for (SVGElement *element in elements)
+    for (SVGElement *element in self.elements) {
 		[element drawRect:dirtyRect];
+    }
 }
 
-- (id)initWithAttributes:(NSDictionary *)attributeDict {
+- (instancetype)initWithAttributes:(NSDictionary *)attributeDict {
 	return nil;
 }
 
-- (void)dealloc {
-	[elements release];
-	[containerStack release];
-	[super dealloc];
-}
 
-- (void)setScale:(CGFloat)newScale {
-	scale = newScale;
+- (void)setScale:(CGFloat)scale {
+	_scale = scale;
+    CGRect normalFrame = self.normalFrame;
 	[self setFrame:CGRectMake(normalFrame.origin.x*scale, normalFrame.origin.y*scale, normalFrame.size.width*scale, normalFrame.size.height*scale)];
 }
 
 - (void)configureWithAttributes:(NSDictionary *)attributeDict {
 	NSLog(@"%@", attributeDict);
 	
-	if ([attributeDict objectForKey:@"viewBox"]) {
+	if (attributeDict[@"viewBox"]) {
 		int count = 4;
 		float floats[] = {0,0,0,0}; // To appease the Clang gods
 		int index = 0;
-		NSScanner *scanner = [NSScanner scannerWithString:[attributeDict objectForKey:@"viewBox"]];
+		NSScanner *scanner = [NSScanner scannerWithString:attributeDict[@"viewBox"]];
 		while (![scanner isAtEnd]) {
 			if (index < count) {
 				if (![scanner scanFloat:&floats[index]])
@@ -94,10 +94,10 @@
 			}
 			else break;
 		}
-		normalFrame = CGRectMake(floats[0], floats[1], floats[2], floats[3]);
+		self.normalFrame = CGRectMake(floats[0], floats[1], floats[2], floats[3]);
 	}
 	else {
-		normalFrame = CGRectMake(0, 0, [[attributeDict objectForKey:@"width"] floatValue], [[attributeDict objectForKey:@"height"] floatValue]);
+		self.normalFrame = CGRectMake(0, 0, [attributeDict[@"width"] floatValue], [attributeDict[@"height"] floatValue]);
 	}
 	
 	self.scale = 1.0;
@@ -115,6 +115,7 @@
 - (void)parser:(NSXMLParser *)parser didStartElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI
  qualifiedName:(NSString *)qualifiedName attributes:(NSDictionary *)attributeDict {
 	//NSLog(@"parser:%@ didStartElement:%@ namespaceURI:%@ qualifiedName:%@ attributes:%@", parser, elementName, namespaceURI, qualifiedName, attributeDict);
+    NSMutableArray * containerStack = self.containerStack;
 	if ([elementName isEqualToString:@"svg"]) {
 		[containerStack addObject:self];
 		[self configureWithAttributes:attributeDict];
@@ -122,11 +123,10 @@
 	}
 	if ([elementName isEqualToString:@"g"]) {
 		SVGElement<SVGContainer> *container = [containerStack lastObject];
-		SVGGroup *group = [[SVGGroup alloc] initWithAttributes:attributeDict];
+		SVGGroup *group = [(SVGGroup *)[SVGGroup alloc] initWithAttributes:attributeDict];
 		group.parentContainer = container;
 		[container.elements addObject:group];
 		[containerStack addObject:group];
-		[group release];
 		//NSLog(@"Add %@ to the %@", group, container);
 		return;
 	}
@@ -135,7 +135,6 @@
 		SVGPath *path = [[SVGPath alloc] initWithAttributes:attributeDict];
 		path.parentContainer = container;
 		[container.elements addObject:path];
-		[path release];
 		//NSLog(@"Add %@ to the %@", path, container);
 		return;
 	}
@@ -144,7 +143,8 @@
 }
 
 - (void)parser:(NSXMLParser *)parser didEndElement:(NSString *)elementName namespaceURI:(NSString *)namespaceURI qualifiedName:(NSString *)qName {
-	//NSLog(@"parser:%@ didEndElement:%@ namespaceURI:%@ qualifiedName:%@", parser, elementName, namespaceURI, qName);
+    //NSLog(@"parser:%@ didEndElement:%@ namespaceURI:%@ qualifiedName:%@", parser, elementName, namespaceURI, qName);
+    NSMutableArray * containerStack = self.containerStack;
 	if ([elementName isEqualToString:@"svg"]) {
 		if ([containerStack lastObject] == self) {
 			//NSLog(@"Stack's successfully cleaned");
@@ -224,13 +224,12 @@
 
 - (void)parserDidEndDocument:(NSXMLParser *)parser {
 	//NSLog(@"parserDidEndDocument:%@", parser);
-	[containerStack release];
-	containerStack = nil;
+	self.containerStack = nil;
 }
 
 - (void)parserDidStartDocument:(NSXMLParser *)parser {
 	//NSLog(@"parserDidStartDocument:%@", parser);
-	containerStack = [[NSMutableArray alloc] init];
+	self.containerStack = [[NSMutableArray alloc] init];
 }
 
 @end

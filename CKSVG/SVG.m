@@ -36,7 +36,7 @@ CGColorRef SVGColorWithPaint(NSString *paint) {
 		return NULL;
 		
 	if ([paint isEqualToString:@"none"])
-		return CGColorGetConstantColor(kCGColorClear);
+		return CGColorRetain(CGColorGetConstantColor(kCGColorClear));
 	
 	if ([paint isEqualToString:@"currentColor"])
 		return NULL;
@@ -57,7 +57,7 @@ CGColorRef SVGColorWithPaint(NSString *paint) {
 		NSArray *values = [valuesStr componentsSeparatedByString:@","];
 		CGFloat colors[3];
 		for (int i = 0; i < 3; i++) {
-			NSString *colorStr = [values objectAtIndex:i];
+			NSString *colorStr = values[i];
 			if ([[colorStr substringFromIndex:[colorStr length]-1] isEqualToString:@"%"]) {
 				colorStr = [colorStr substringToIndex:[colorStr length]-1];
 				colors[i] = (CGFloat)[colorStr floatValue]/100.0;
@@ -86,7 +86,7 @@ CGLineJoin SVGLineJoinWithLineJoin(NSString *lineJoin) {
 		return kCGLineJoinRound;
 	if ([lineJoin isEqualToString:@"bevel"])
 		return kCGLineJoinBevel;
-	return NSNotFound;
+	return kCGLineJoinMiter;
 }
 
 

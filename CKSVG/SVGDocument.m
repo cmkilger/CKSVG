@@ -30,8 +30,12 @@
 #import "SVGDocument.h"
 
 
-@implementation SVGDocument
+@interface SVGDocument ()
 
-@synthesize elements;
+@property (strong) NSMutableArray *elements;
+
+@end
+
+@implementation SVGDocument
 
 @end

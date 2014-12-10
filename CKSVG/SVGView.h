@@ -27,18 +27,14 @@
  *	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-#import <Foundation/Foundation.h>
 #import "SVGContainer.h"
 
-@interface SVGView : NSView <NSXMLParserDelegate, SVGContainer> {
-	NSMutableArray *elements;
-	NSMutableArray *containerStack;
-	CGFloat scale;
-	CGRect normalFrame;
-}
+@import AppKit;
+
+@interface SVGView : NSView <NSXMLParserDelegate, SVGContainer>
 
 @property (nonatomic, assign) CGFloat scale;
 
-- (id)initWithData:(NSData *)data;
+- (instancetype)initWithData:(NSData *)data;
 
 @end

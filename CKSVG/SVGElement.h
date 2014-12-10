@@ -27,26 +27,21 @@
  *	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
+@import Foundation;
+
 @protocol SVGContainer;
 @class SVGElement;
 
-@interface SVGElement : NSObject {
-	SVGElement<SVGContainer> *parentContainer;
-	
-	CGColorRef fill;
-	CGColorRef stroke;
-	CGFloat strokeWidth;
-	CGLineJoin strokeLineJoin;
-}
+@interface SVGElement : NSObject
 
-@property (nonatomic, assign) SVGElement<SVGContainer> *parentContainer;
+@property (weak) SVGElement<SVGContainer> *parentContainer;
 
-@property (nonatomic, readonly) CGColorRef fill;
-@property (nonatomic, readonly) CGColorRef stroke;
-@property (nonatomic, readonly) CGFloat strokeWidth;
-@property (nonatomic, readonly) CGLineJoin strokeLineJoin;
+@property (readonly) CGColorRef fill;
+@property (readonly) CGColorRef stroke;
+@property (readonly) CGFloat strokeWidth;
+@property (readonly) CGLineJoin strokeLineJoin;
 
-- (id)initWithAttributes:(NSDictionary *)attributeDict parent:(SVGElement<SVGContainer> *)parent;
+- (instancetype)initWithAttributes:(NSDictionary *)attributeDict parent:(SVGElement<SVGContainer> *)parent;
 - (void)drawRect:(NSRect)dirtyRect;
 
 @end

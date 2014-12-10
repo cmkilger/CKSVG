@@ -27,9 +27,9 @@
  *	SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-@protocol SVGElement;
+@import Foundation;
 
-@protocol SVGContainer<SVGElement>
+@protocol SVGContainer
 
 @property (nonatomic, readonly) NSMutableArray *elements;
 

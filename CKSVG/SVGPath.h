@@ -29,8 +29,8 @@
 
 #import "SVGElement.h"
 
-@interface SVGPath : SVGElement {
-	CGMutablePathRef path;
-}
+@interface SVGPath : SVGElement
+
+- (instancetype)initWithAttributes:(NSDictionary *)attributeDict NS_DESIGNATED_INITIALIZER;
 
 @end

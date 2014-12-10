@@ -28,18 +28,11 @@
  */
 
 #import "SVGElement.h"
+#import "SVGElementInternal.h"
 
 @implementation SVGElement
 
-@synthesize parentContainer;
-
-@synthesize fill;
-@synthesize stroke;
-@synthesize strokeWidth;
-@synthesize strokeLineJoin;
-
-
-- (id)initWithAttributes:(NSDictionary *)attributeDict parent:(SVGElement<SVGContainer> *)parent {
+- (instancetype)initWithAttributes:(NSDictionary *)attributeDict parent:(SVGElement<SVGContainer> *)parent {
 	NSLog(@"SVGElement is an abstract class, -initWithAttributes:parent: should be implemented in the subclass.");
 	return nil;
 }

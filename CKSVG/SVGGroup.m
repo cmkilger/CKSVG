@@ -30,26 +30,27 @@
 #import "SVGGroup.h"
 #import "SVG.h"
 
+@interface SVGGroup ()
+    
+@property (strong) NSMutableArray *elements;
+
+@end
+
 @implementation SVGGroup
 
-@synthesize elements;
-
-- (id)initWithAttributes:(NSDictionary *)attributeDict {
-	if (![super init])
-		return nil;
-	elements = [[NSMutableArray alloc] init];
+- (instancetype)initWithAttributes:(NSDictionary *)attributeDict {
+    self = [super init];
+    if (self) {
+        self.elements = [[NSMutableArray alloc] init];
+    }
 	return self;
 }
 
 - (void)drawRect:(NSRect)dirtyRect {
 //	NSLog(@"Draw group");
-	for (SVGElement *element in elements)
+    for (SVGElement *element in self.elements) {
 		[element drawRect:dirtyRect];
-}
-
-- (void)dealloc {
-	[elements release];
-	[super dealloc];
+    }
 }
 
 @end
